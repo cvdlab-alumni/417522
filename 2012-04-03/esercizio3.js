@@ -23,12 +23,13 @@ COLOR( [179/255, 175/255, 156/255] ) (floor);
 var poolDown1 = SIMPLEX_GRID([ [-1, 20], [-1, 9], [(thickness-0.5)] ]);
 var poolUp1 = SIMPLEX_GRID([ [-1, 20], [-1, 9], [(thickness-0.49)] ]);
 
-var poolDown2 = SIMPLEX_GRID([ [-47, 4], [-5, 11], [(thickness-0.5)] ]);
-var poolUp2 = SIMPLEX_GRID([ [-47, 4], [-5, 11], [(thickness-0.49)] ]);
+var poolDown2 = SIMPLEX_GRID([ [-47, 4], [-5, 11], [(-thickness-0.5)] ]);
+var poolUp2 = SIMPLEX_GRID([ [-47, 4], [-5, 11], [(-thickness-0.49)] ]);
 
 COLOR([ 0/255, 116/255, 120/255])(poolUp1);
 COLOR([ 0/255, 116/255, 120/255])(poolUp2);
 
+var pools = STRUCT( [poolUp1, poolUp2, poolDown1, poolDown2] );
 
 var wall1 = SIMPLEX_GRID([ [-0.8,7.2],[-0.8,0.2], [-thickness, wallThickness] ]);
 var wall2_1 = SIMPLEX_GRID([ [-0.8,0.2],[-0.8,1.2], [-thickness, wallThickness] ]);
@@ -169,12 +170,14 @@ var benchSupports7 = bench6Supports([20.7,14.8], 2.6);
 
 var bench1 = SIMPLEX_GRID( [ [-7.8,15.2], [-14.2,0.6], [-0.4,0.1] ] );
 
-var bench = STRUCT( [benchSupports1, benchSupports2, benchSupports3, benchSupports4, benchSupports5,
-					 benchSupports6, benchSupports7, bench1 ] );
+
+var bench = T ([2])([thickness])(STRUCT( [benchSupports1, benchSupports2, benchSupports3, benchSupports4, benchSupports5,
+					 benchSupports6, benchSupports7, bench1 ] ) );
+
 COLOR([ [179/255, 175/255, 156/255] ])(bench);
 
 
 
-var building = STRUCT( [floor, stairs, walls, thinWalls, columns, roof, bench] );
+var building = STRUCT( [floor, stairs, walls, thinWalls, columns, roof, bench, pools] );
 
 DRAW(building);

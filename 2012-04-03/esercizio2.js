@@ -1,13 +1,8 @@
-//ALTEZZA MURI 6.75 + BASE
 
 var thickness = 2;
 var wallThickness = 3;
 
-/*
-20cm grossi
-10cm muri piccoli
-5 cm vetrate
-*/
+
 
 var floor1 = SIMPLEX_GRID([ [39],[1], [thickness] ]);
 var floor2 = SIMPLEX_GRID([ [1],[2], [thickness] ]);
@@ -23,6 +18,14 @@ var floor10 = SIMPLEX_GRID([ [-51,1],[-5,1], [thickness] ]);
 var floor = STRUCT( [floor1, floor2, floor3, floor4, floor5, floor6, floor7, floor8, floor9,
 					 floor10] );
 
+
+var poolDown1 = SIMPLEX_GRID([ [-1, 20], [-1, 9], [(thickness-0.5)] ]);
+var poolUp1 = SIMPLEX_GRID([ [-1, 20], [-1, 9], [(thickness-0.49)] ]);
+
+var poolDown2 = SIMPLEX_GRID([ [-47, 4], [-5, 11], [(-thickness-0.5)] ]);
+var poolUp2 = SIMPLEX_GRID([ [-47, 4], [-5, 11], [(-thickness-0.49)] ]);
+
+var pools = STRUCT( [poolUp1, poolUp2, poolDown1, poolDown2] );
 
 var wall1 = SIMPLEX_GRID([ [-0.8,7.2],[-0.8,0.2], [-thickness, wallThickness] ]);
 var wall2_1 = SIMPLEX_GRID([ [-0.8,0.2],[-0.8,1.2], [-thickness, wallThickness] ]);
@@ -101,15 +104,12 @@ var column8 = SIMPLEX_GRID( [ [-(45 - widthColumn/2),widthColumn], [-(7 - widthC
 var columns = STRUCT( [column1, column2, column3, column4, column5, column6, column7, column8] );
 
 
-
-
 var roofThickness = 0.5;
 var roof1 = SIMPLEX_GRID( [ [-24,23], [-4, 13], [-thickness -wallThickness, roofThickness] ] );
 var roof2 = SIMPLEX_GRID( [ [-0.2,9.6], [-13.2, 9.8], [-thickness -wallThickness, roofThickness] ] );
 var roof3 = SIMPLEX_GRID( [ [-24,23], [-4, 13], [-thickness -wallThickness -roofThickness, 0.5] ] );
 
 var roof = STRUCT( [roof1, roof2] );
-
 
 
 // v1: vertice in alto a sinistra
@@ -154,11 +154,14 @@ var benchSupports7 = bench6Supports([20.7,14.8], 2.6);
 
 var bench1 = SIMPLEX_GRID( [ [-7.8,15.2], [-14.2,0.6], [-0.4,0.1] ] );
 
-var bench = STRUCT( [benchSupports1, benchSupports2, benchSupports3, benchSupports4, benchSupports5,
-					 benchSupports6, benchSupports7, bench1 ] );
+
+var bench = T ([2])([thickness])(STRUCT( [benchSupports1, benchSupports2, benchSupports3, benchSupports4, benchSupports5,
+					 benchSupports6, benchSupports7, bench1 ] ) );
 
 
 
-var building = STRUCT( [floor, stairs, walls, thinWalls, columns, roofs, bench] );
+
+
+var building = STRUCT( [floor, stairs, walls, thinWalls, columns, roof, bench, pools] );
 
 DRAW(building);
