@@ -47,8 +47,12 @@ var thinWall3 = SIMPLEX_GRID( [ [-42.55,0.05], [-5,6.4], [-thickness, wallThickn
 var thinWall4 = SIMPLEX_GRID( [ [-30,11.4], [-4.95,0.05], [-thickness, wallThickness] ] );
 var thinWall5 = SIMPLEX_GRID( [ [-1,6], [-16.95,0.05], [-thickness, wallThickness] ] );
 var thinWall6 = SIMPLEX_GRID( [ [-8,1], [-16.95,0.05], [-thickness, wallThickness] ] );
+// DA AGGIUNGERE AL 2D
+var thinWall7 = SIMPLEX_GRID( [ [-31,0.05], [-7.4,6.4], [-thickness, wallThickness] ] );
+var thinWall8 = SIMPLEX_GRID( [ [-32,0.05], [-7.4,6.4], [-thickness, wallThickness] ] );
+var thinWall9 = SIMPLEX_GRID( [ [-30,10], [-13.8,0.05], [-thickness, wallThickness] ] );
 
-var thinWalls = STRUCT( [thinWall1, thinWall2, thinWall3, thinWall4, thinWall5, thinWall6] );
+var thinWalls = STRUCT( [thinWall1, thinWall2, thinWall3, thinWall4, thinWall5, thinWall6, thinWall7, thinWall8, thinWall9 ] );
 
 
 // point: vertice in basso a sinistra del rettangolo
@@ -85,6 +89,30 @@ var p1 = [35.2,1];
 
 var stairs = buildStairs(p1,7,stepWidth,stepHeight,stepThickness);
 
-var building = STRUCT( [floor, stairs, walls, thinWalls] );
+var widthColumn = 0.40;
+var column1 = SIMPLEX_GRID( [ [-(26 - widthColumn/2),widthColumn], [-(14 - widthColumn/2), widthColumn], [-thickness,wallThickness] ] );
+var column2 = SIMPLEX_GRID( [ [-(26 - widthColumn/2),widthColumn], [-(7 - widthColumn/2), widthColumn], [-thickness,wallThickness] ] );
+var column3 = SIMPLEX_GRID( [ [-(32.2 - widthColumn/2),widthColumn], [-(14 - widthColumn/2), widthColumn], [-thickness,wallThickness] ] );
+var column4 = SIMPLEX_GRID( [ [-(32.2 - widthColumn/2),widthColumn], [-(7 - widthColumn/2), widthColumn], [-thickness,wallThickness] ] );
+var column5 = SIMPLEX_GRID( [ [-(38.6 - widthColumn/2),widthColumn], [-(14 - widthColumn/2), widthColumn], [-thickness,wallThickness] ] );
+var column6 = SIMPLEX_GRID( [ [-(38.6 - widthColumn/2),widthColumn], [-(7 - widthColumn/2), widthColumn], [-thickness,wallThickness] ] );
+var column7 = SIMPLEX_GRID( [ [-(45 - widthColumn/2),widthColumn], [-(14 - widthColumn/2), widthColumn], [-thickness,wallThickness] ] );
+var column8 = SIMPLEX_GRID( [ [-(45 - widthColumn/2),widthColumn], [-(7 - widthColumn/2), widthColumn], [-thickness,wallThickness] ] );
+
+var columns = STRUCT( [column1, column2, column3, column4, column5, column6, column7, column8] );
+
+
+//var bench = SIMPLEX_GRID( [ [],[],[] ] );
+
+
+var roofThickness = 0.5;
+var roof1 = SIMPLEX_GRID( [ [-24,23], [-4, 13], [-thickness -wallThickness, roofThickness] ] );
+var roof2 = SIMPLEX_GRID( [ [10], [-13.2, 9.8], [-thickness -wallThickness, roofThickness] ] );
+
+var roofs = STRUCT( [roof1, roof2] );
+
+
+
+var building = STRUCT( [floor, stairs, walls, thinWalls, columns, roofs] );
 
 DRAW(building);
