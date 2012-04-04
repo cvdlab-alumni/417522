@@ -95,12 +95,20 @@ var wall7 = buildRectangleByMeasure([37.8,16.2],13.4,0.2);
 var wall8 = buildRectangleByMeasure([51,16.2],0.2,11.4);
 var wall9 = buildRectangleByMeasure([41.4,5],9.8,0.2);
 var wall10 = buildRectangleByMeasure([37.2,11.6],5.4,0.2);
-var wall11 = buildRectangleByMeasure([0.8,17],6.4,0.2);
-var wall12 = buildRectangleByMeasure([7.8,17],1.4,0.2);
+
+//var wall11 = buildRectangleByMeasure([0.8,17],6.4,0.2);
+//var wall12 = buildRectangleByMeasure([7.8,17],1.4,0.2);
+
+var thinWall1 = POLYLINE( [ [44.7,14.2], [44.7,6.8] ] );	// muro verticale a sx della piscina
+var thinWall2 = POLYLINE( [ [38.8,5], [38.8,11.4] ] );
+var thinWall3 = POLYLINE( [ [42.6,5], [42.6,11.4] ] );
+var thinWall4 = POLYLINE( [ [30,5], [41.4,5] ] );
+var thinWall5 = POLYLINE( [ [1,17], [7,17] ] );
+var thinWall6 = POLYLINE( [ [8,17], [9,17] ] );
 
 var thickWalls = STRUCT( [wall1, wall2, wall3, wall4, wall5, wall6, wall7, wall8, wall9, 
-					 wall10, wall11, wall12 ] );
-var thinWalls
+					 wall10] );
+var thinWalls = STRUCT( [thinWall1, thinWall2, thinWall3, thinWall4, thinWall5, thinWall6] );
 
 var walls = STRUCT( [thickWalls, thinWalls] );
 
@@ -114,5 +122,5 @@ COLOR([0,0,0])(internalGrid);
 */
 COLOR([0,0,0])(walls);
 
-//DRAW(piantina);
-DRAW(walls);
+DRAW(piantina);
+//DRAW(walls);

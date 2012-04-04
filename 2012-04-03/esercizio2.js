@@ -1,5 +1,8 @@
+//ALTEZZA MURI 6.75 + BASE
+
 var thickness = 2;
 var wallThickness = 3;
+
 /*
 20cm grossi
 10cm muri piccoli
@@ -8,7 +11,7 @@ var wallThickness = 3;
 
 var floor1 = SIMPLEX_GRID([ [39],[1], [thickness] ]);
 var floor2 = SIMPLEX_GRID([ [1],[2], [thickness] ]);
-var floor3 = SIMPLEX_GRID([ [-1,8],[-17.5,5], [thickness] ]);
+var floor3 = SIMPLEX_GRID([ [-1,8],[-17,5], [thickness] ]);
 var floor4 = SIMPLEX_GRID([ [-1,38],[-10,7], [thickness] ]);
 var floor5 = SIMPLEX_GRID([ [-1,38],[-10,7], [thickness] ]);
 var floor6 = SIMPLEX_GRID([ [-21,26],[-4,6], [thickness] ]);
@@ -36,7 +39,17 @@ var wall9 = SIMPLEX_GRID([ [-41.4,9.8], [-4.8,0.2], [-thickness, wallThickness] 
 var wall10 = SIMPLEX_GRID([ [-37.2,5.4], [-11.4,0.2], [-thickness, wallThickness] ]);
 
 var walls = STRUCT( [wall1, wall2_1, wall2_2, wall3, wall4, wall5, wall6, wall7_1, wall7_2, wall8_1, wall8_2, wall9,
-					 wall10, wall11, wall12 ] );
+					 wall10] );
+
+var thinWall1 = SIMPLEX_GRID( [ [-44.7,0.05], [-6.8,7.4], [-thickness, wallThickness] ] );
+var thinWall2 = SIMPLEX_GRID( [ [-38.75,0.05], [-5,6.4], [-thickness, wallThickness] ] );
+var thinWall3 = SIMPLEX_GRID( [ [-42.55,0.05], [-5,6.4], [-thickness, wallThickness] ] );
+var thinWall4 = SIMPLEX_GRID( [ [-30,11.4], [-4.95,0.05], [-thickness, wallThickness] ] );
+var thinWall5 = SIMPLEX_GRID( [ [-1,6], [-16.95,0.05], [-thickness, wallThickness] ] );
+var thinWall6 = SIMPLEX_GRID( [ [-8,1], [-16.95,0.05], [-thickness, wallThickness] ] );
+
+var thinWalls = STRUCT( [thinWall1, thinWall2, thinWall3, thinWall4, thinWall5, thinWall6] );
+
 
 // point: vertice in basso a sinistra del rettangolo
 var buildStep = function (point,width,height,thickness) {
@@ -72,6 +85,6 @@ var p1 = [35.2,1];
 
 var stairs = buildStairs(p1,7,stepWidth,stepHeight,stepThickness);
 
-var building = STRUCT( [floor, stairs, walls] );
+var building = STRUCT( [floor, stairs, walls, thinWalls] );
 
 DRAW(building);
