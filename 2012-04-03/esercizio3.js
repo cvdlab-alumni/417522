@@ -22,6 +22,7 @@ var floor10 = SIMPLEX_GRID([ [-51,1],[-5,1], [thickness] ]);
 
 var floor = STRUCT( [floor1, floor2, floor3, floor4, floor5, floor6, floor7, floor8, floor9,
 					 floor10] );
+COLOR( [179/255, 175/255, 156/255] ) (floor);
 
 
 var wall1 = SIMPLEX_GRID([ [-0.8,7.2],[-0.8,0.2], [-thickness, wallThickness] ]);
@@ -41,6 +42,8 @@ var wall10 = SIMPLEX_GRID([ [-37.2,5.4], [-11.4,0.2], [-thickness, wallThickness
 var walls = STRUCT( [wall1, wall2_1, wall2_2, wall3, wall4, wall5, wall6, wall7_1, wall7_2, wall8_1, wall8_2, wall9,
 					 wall10] );
 
+COLOR([130/255, 123/255, 99/255])(walls);
+
 
 var thinWall1 = SIMPLEX_GRID( [ [-44.7,0.05], [-6.8,7.4], [-thickness, wallThickness] ] );
 var thinWall2 = SIMPLEX_GRID( [ [-38.75,0.05], [-5,6.4], [-thickness, wallThickness] ] );
@@ -53,6 +56,7 @@ var thinWall8 = SIMPLEX_GRID( [ [-32,0.05], [-7.4,6.4], [-thickness, wallThickne
 var thinWall9 = SIMPLEX_GRID( [ [-30,10], [-13.8,0.05], [-thickness, wallThickness] ] );
 
 var thinWalls = STRUCT( [thinWall1, thinWall2, thinWall3, thinWall4, thinWall5, thinWall6, thinWall7, thinWall8, thinWall9 ] );
+COLOR([150/255, 157/255, 161/255])(thinWalls)
 
 // point: vertice in basso a sinistra del rettangolo
 var buildStep = function (point,width,height,thickness) {
@@ -99,6 +103,7 @@ var column7 = SIMPLEX_GRID( [ [-(45 - widthColumn/2),widthColumn], [-(14 - width
 var column8 = SIMPLEX_GRID( [ [-(45 - widthColumn/2),widthColumn], [-(7 - widthColumn/2), widthColumn], [-thickness,wallThickness] ] );
 
 var columns = STRUCT( [column1, column2, column3, column4, column5, column6, column7, column8] );
+COLOR([166/255, 171/255, 181/255])(columns);
 
 
 
@@ -109,6 +114,10 @@ var roof2 = SIMPLEX_GRID( [ [-0.2,9.6], [-13.2, 9.8], [-thickness -wallThickness
 var roof3 = SIMPLEX_GRID( [ [-24,23], [-4, 13], [-thickness -wallThickness -roofThickness, 0.5] ] );
 
 var roof = STRUCT( [roof1, roof2] );
+
+COLOR( [241/255, 238/255, 226/255] )(roof1);
+COLOR( [241/255, 238/255, 226/255] )(roof2);
+COLOR( [38/255, 38/255, 39/255] )(roof3);
 
 
 var bench1 = SIMPLEX_GRID( [ [-7.8,15.2], [-14.2,0.6], [-0.4,0.1] ] );
@@ -155,6 +164,7 @@ var benchSupports7 = bench6Supports([20.7,14.8], 2.6);
 
 var bench = STRUCT( [benchSupports1, benchSupports2, benchSupports3, benchSupports4, benchSupports5,
 					 benchSupports6, benchSupports7 ] );
+COLOR([ [179/255, 175/255, 156/255] ])(bench);
 
 
 
