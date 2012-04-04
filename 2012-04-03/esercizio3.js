@@ -1,13 +1,8 @@
-//ALTEZZA MURI 6.75 + BASE
 
 var thickness = 2;
 var wallThickness = 3;
 
-/*
-20cm grossi
-10cm muri piccoli
-5 cm vetrate
-*/
+
 
 var floor1 = SIMPLEX_GRID([ [39],[1], [thickness] ]);
 var floor2 = SIMPLEX_GRID([ [1],[2], [thickness] ]);
@@ -23,6 +18,16 @@ var floor10 = SIMPLEX_GRID([ [-51,1],[-5,1], [thickness] ]);
 var floor = STRUCT( [floor1, floor2, floor3, floor4, floor5, floor6, floor7, floor8, floor9,
 					 floor10] );
 COLOR( [179/255, 175/255, 156/255] ) (floor);
+
+
+var poolDown1 = SIMPLEX_GRID([ [-1, 20], [-1, 9], [(thickness-0.5)] ]);
+var poolUp1 = SIMPLEX_GRID([ [-1, 20], [-1, 9], [(thickness-0.49)] ]);
+
+var poolDown2 = SIMPLEX_GRID([ [-47, 4], [-5, 11], [(thickness-0.5)] ]);
+var poolUp2 = SIMPLEX_GRID([ [-47, 4], [-5, 11], [(thickness-0.49)] ]);
+
+COLOR([ 0/255, 116/255, 120/255])(poolUp1);
+COLOR([ 0/255, 116/255, 120/255])(poolUp2);
 
 
 var wall1 = SIMPLEX_GRID([ [-0.8,7.2],[-0.8,0.2], [-thickness, wallThickness] ]);
@@ -92,6 +97,8 @@ var p1 = [35.2,1];
 
 var stairs = buildStairs(p1,7,stepWidth,stepHeight,stepThickness);
 
+COLOR( [179/255, 175/255, 156/255] ) (stairs);
+
 var widthColumn = 0.40;
 var column1 = SIMPLEX_GRID( [ [-(26 - widthColumn/2),widthColumn], [-(14 - widthColumn/2), widthColumn], [-thickness,wallThickness] ] );
 var column2 = SIMPLEX_GRID( [ [-(26 - widthColumn/2),widthColumn], [-(7 - widthColumn/2), widthColumn], [-thickness,wallThickness] ] );
@@ -119,8 +126,6 @@ COLOR( [241/255, 238/255, 226/255] )(roof1);
 COLOR( [241/255, 238/255, 226/255] )(roof2);
 COLOR( [38/255, 38/255, 39/255] )(roof3);
 
-
-var bench1 = SIMPLEX_GRID( [ [-7.8,15.2], [-14.2,0.6], [-0.4,0.1] ] );
 
 // v1: vertice in alto a sinistra
 var bench4Supports = function (v1, width) {
@@ -162,12 +167,14 @@ var benchSupports5 = bench4Supports([16.5,14.8], 2.6);
 var benchSupports6 = bench4Supports([18.6,14.8], 2.6); 
 var benchSupports7 = bench6Supports([20.7,14.8], 2.6);
 
+var bench1 = SIMPLEX_GRID( [ [-7.8,15.2], [-14.2,0.6], [-0.4,0.1] ] );
+
 var bench = STRUCT( [benchSupports1, benchSupports2, benchSupports3, benchSupports4, benchSupports5,
-					 benchSupports6, benchSupports7 ] );
+					 benchSupports6, benchSupports7, bench1 ] );
 COLOR([ [179/255, 175/255, 156/255] ])(bench);
 
 
 
-var building = STRUCT( [floor, stairs, walls, thinWalls, columns, roofs, bench] );
+var building = STRUCT( [floor, stairs, walls, thinWalls, columns, roof, bench] );
 
 DRAW(building);

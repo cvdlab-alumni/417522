@@ -111,7 +111,6 @@ var roof3 = SIMPLEX_GRID( [ [-24,23], [-4, 13], [-thickness -wallThickness -roof
 var roof = STRUCT( [roof1, roof2] );
 
 
-var bench1 = SIMPLEX_GRID( [ [-7.8,15.2], [-14.2,0.6], [-0.4,0.1] ] );
 
 // v1: vertice in alto a sinistra
 var bench4Supports = function (v1, width) {
@@ -153,8 +152,10 @@ var benchSupports5 = bench4Supports([16.5,14.8], 2.6);
 var benchSupports6 = bench4Supports([18.6,14.8], 2.6); 
 var benchSupports7 = bench6Supports([20.7,14.8], 2.6);
 
+var bench1 = SIMPLEX_GRID( [ [-7.8,15.2], [-14.2,0.6], [-0.4,0.1] ] );
+
 var bench = STRUCT( [benchSupports1, benchSupports2, benchSupports3, benchSupports4, benchSupports5,
-					 benchSupports6, benchSupports7 ] );
+					 benchSupports6, benchSupports7, bench1 ] );
 
 
 
