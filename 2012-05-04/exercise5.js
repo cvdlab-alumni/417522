@@ -78,7 +78,7 @@ wingsImg = S([0,1,2])([0.5,0.5,0.5])(wingsImg);
 wingsImg = T([0])([3])(wingsImg);
 wingsImg = COLOR(grey)(wingsImg);
 
-DRAW(wingsImg);
+//DRAW(wingsImg);
 
 //----------------------------------------------------------------------------
 
@@ -128,8 +128,7 @@ var fusoliera = MAP(fusolieraMapping)(domain2);
 fusoliera = S([0,1,2])([2,2,2])(fusoliera);
 fusoliera = COLOR(grey)(fusoliera);
 
-DRAW(fusoliera);
-
+//DRAW(fusoliera);
 
 
 // eliche
@@ -160,7 +159,7 @@ eliches = R([0,1])([PI/2])(eliches);
 eliches = T([0,1])([-1.3,-1.3])(eliches);
 eliches = S([0,1,2])([0.7,0.7,0.7])(eliches);
 
-DRAW(eliches);
+//DRAW(eliches);
 
 
 //----------------------------------------------------------------------------
@@ -226,7 +225,8 @@ exports.eliche = eliche;
 return eliche;
 }(this);
 
-DRAW(eliche);
+//DRAW(eliche);
+
 
 //---------------------------------------------------------------------------------
 
@@ -256,8 +256,7 @@ asta5 = R([0,1])([PI/8])(asta5);
 var ruote = STRUCT([ruota1,ruota2,asta1,asta2,asta3,asta4,asta5]);
 ruote = T([0,1])([1,0.5])(ruote);
 
-DRAW(ruote);
-
+//DRAW(ruote);
 
 var mezzaSfera = function(r,color){
 		r = r || 1;
@@ -285,7 +284,13 @@ endElica = S([0])([-1])(endElica);
 endElica = T([0,1])([-0.2,-1])(endElica);
 
 
-DRAW(endElica);
+//DRAW(endElica);
+
+
+var plane = STRUCT([fusoliera,eliche,eliches,wingsImg,ruote,endElica]);
+plane = R([0,1])([PI/40])(plane);
+DRAW(plane);
+
 
 //--------------------------------------------------------------------------------------------------------
 
