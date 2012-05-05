@@ -194,3 +194,29 @@ return eliche;
 DRAW(eliche);
 
 //---------------------------------------------------------------------------------
+
+// wheels
+var ruota = TORUS_SURFACE([0.2, 0.4])([36,8]);
+ruota1 = T([2])([0.8])(ruota);
+
+var ruota2 = T([2])([-0.8])(ruota);
+
+var asta1 = CUBOID([0.1,0.1,1.8]);
+asta1 = T([2])([-1])(asta1);
+
+var asta2 = CUBOID([0.1,0.1,1.2]);
+asta2 = R([0,2])([PI/4])(asta2);
+asta2 = R([1,2])([PI/4])(asta2);
+asta2 = T([2])([-0.8])(asta2);
+
+var asta3 = S([2])([-1])(asta2);
+
+var asta4 = S([0])([-1])(asta2);
+asta4 = R([0,1])([PI/8])(asta4);
+var asta5 = S([0])([-1])(asta3);
+asta5 = R([0,1])([PI/8])(asta5);
+
+var ruote = STRUCT([ruota1,ruota2,asta1,asta2,asta3,asta4,asta5]);
+ruote = T([0,1])([1,0.5])(ruote);
+
+DRAW(ruote);
