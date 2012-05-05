@@ -132,6 +132,37 @@ DRAW(fusoliera);
 
 
 
+// eliche
+var e1 = [[-0.005,0,0],[-0.3,0,-2.5],[0,0,-3.5],[0.3,0,-2.5],[0.005,0,0],[-0.005,0,0]];
+var e12 = [[0,0,0]];
+var ce1 = BEZIER(S0)(e1);
+var ce12 = BEZIER(S0)(e12);
+var e2 = e1.map(function (p) {return [p[0],p[1]+0.2,p[2]]});
+var e22 = [[0,0,0]];
+var ce2 = BEZIER(S0)(e2);
+var ce22 = BEZIER(S0)(e22);
+var elicaMapping = BEZIER(S1)([ce1,ce2]);
+var coverElica1 = BEZIER(S1)([ce1,ce12]);
+var coverElica2 = BEZIER(S1)([ce2,ce22]);
+var el = MAP(elicaMapping)(domain2);
+var elicaCover1 = MAP(coverElica1)(domain2);
+var elicaCover2 = MAP(coverElica2)(domain2);
+var el = STRUCT([el,elicaCover1,elicaCover2]);
+el = COLOR([235/255,221/255,5/255])(el);
+el = T([1])([-1])(el);
+
+var el2 = R([0,2])(PI)(el);
+var el3 = R([0,2])(PI/2)(el);
+var el4 = R([0,2])(-PI/2)(el);
+ 
+eliches = STRUCT([el,el2,el3,el4]);
+eliches = R([0,1])([PI/2])(eliches);
+eliches = T([0,1])([-1.3,-1.3])(eliches);
+eliches = S([0,1,2])([0.7,0.7,0.7])(eliches);
+
+DRAW(eliches);
+
+
 //----------------------------------------------------------------------------
 !function(exports){
 
@@ -259,7 +290,7 @@ DRAW(endElica);
 //--------------------------------------------------------------------------------------------------------
 
 var white = [0.99,0.99,0.99];
-var sand = [237/255, 201/255, 175/255];
+var sand = [217/255, 147/255, 118/255];
 var black = [0,0,0];
 
 
