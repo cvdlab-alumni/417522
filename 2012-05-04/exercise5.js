@@ -286,9 +286,8 @@ var linee = STRUCT([linea1,linea2,linea3,linea4,linea5,linea6,linea7, linea8,lin
 linee = T([0,2])([12,45])(linee);
 
 var pista = STRUCT([asfalto,sabbia,linee]);
+pista = T([0,1,2])([-40,-1,-42])(pista);
+pista = R([0,1])([PI])(pista);
 
-/*
 
-pista = T([0,1,2])([-40,0.105,-25])(pista);
-*/
 DRAW(pista);
