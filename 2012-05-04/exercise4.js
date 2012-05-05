@@ -2,6 +2,9 @@
 var wing2dDomain = INTERVALS(1)(30);
 var domain2 =  DOMAIN([[0,1],[0,1]])([36,36]);
 
+var grey = [216/255,216/255,220/255];
+var black = [0,0,0];
+
 var l = 4; // larghezzaAla
 var h = 0.5; // altezzaAla
 var distanzaXAli = 1;
@@ -73,7 +76,7 @@ var wingsImg = STRUCT([leftWing, rightWing]);
 
 wingsImg = S([0,1,2])([0.5,0.5,0.5])(wingsImg);
 wingsImg = T([0])([3])(wingsImg);
-
+wingsImg = COLOR(grey)(wingsImg);
 
 DRAW(wingsImg);
 
@@ -123,6 +126,7 @@ var fusolieraMapping = BEZIER(S1)([tappo,c0,c1,c2,c3,c4,c5]);
 var fusoliera = MAP(fusolieraMapping)(domain2);
 
 fusoliera = S([0,1,2])([2,2,2])(fusoliera);
+fusoliera = COLOR(grey)(fusoliera);
 
 DRAW(fusoliera);
 
@@ -196,10 +200,12 @@ DRAW(eliche);
 //---------------------------------------------------------------------------------
 
 // wheels
-var ruota = TORUS_SURFACE([0.2, 0.4])([36,8]);
+var ruota = TORUS_SURFACE([0.1, 0.4])([36,8]);
 ruota1 = T([2])([0.8])(ruota);
+ruota1 = COLOR(black)(ruota1);
 
 var ruota2 = T([2])([-0.8])(ruota);
+ruota2 = COLOR(black)(ruota2);
 
 var asta1 = CUBOID([0.1,0.1,1.8]);
 asta1 = T([2])([-1])(asta1);
@@ -220,3 +226,32 @@ var ruote = STRUCT([ruota1,ruota2,asta1,asta2,asta3,asta4,asta5]);
 ruote = T([0,1])([1,0.5])(ruote);
 
 DRAW(ruote);
+
+
+var mezzaSfera = function(r,color){
+		r = r || 1;
+		color = color || [0,0,0, 1];
+
+		var dom = DOMAIN([[0,PI/2],[0,2*PI]])([r*20,r*20]);
+
+		var mapping = function(p){
+			var u = p[0];
+			var v = p[1];
+
+			return [
+				r*SIN(u)*COS(v), r*SIN(u)*SIN(v), r*COS(u)
+			];
+		};
+
+		var mapped = MAP(mapping)(dom);
+
+		return COLOR(color)(mapped);
+};
+
+var endElica = mezzaSfera(0.2,grey);
+endElica = R([0,2])([PI/2])(endElica);
+endElica = S([0])([-1])(endElica);
+endElica = T([0,1])([-0.2,-1])(endElica);
+
+
+DRAW(endElica);

@@ -1,6 +1,6 @@
 // versione base: ala senza alettoni piccoli
 var wing2dDomain = INTERVALS(1)(30);
-var domain2 =  DOMAIN([[0,1],[0,1]])([10,10]);
+var domain2 =  DOMAIN([[0,1],[0,1]])([36,36]);
 
 var l = 4; // larghezzaAla
 var h = 0.5; // altezzaAla
