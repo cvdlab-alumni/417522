@@ -1,12 +1,3 @@
- /*MODEL	D.H.51
-
-DIMENSIONS
-    Wingspan	11.28 m // apertura alare
-    Length	8.08 m 	// lunghezza
-    Height	2.97 m   // altezza
-    Wing area	30.19 m2 // superficie alare
-*/
-
 // versione base: ala senza alettoni piccoli
 var wing2dDomain = INTERVALS(1)(30);
 var domain2 =  DOMAIN([[0,1],[0,1]])([10,10]);
