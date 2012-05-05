@@ -29,7 +29,7 @@ var wing3dDomain = DOMAIN([[0,1],[0,1]])([30,30]);
 //var BEZ_topWing = BEZIER(S1)([cpt0,cpt1,cpt4]);
 var BEZ_topWing = BEZIER(S1)([cpt0,cpt1]);
 var topWing = MAP(BEZ_topWing)(wing3dDomain);
-DRAW(COLOR([1,0,0,0.8])(topWing));
+DRAW(topWing);
 
 //bottomWing
 var bottomWing = T([0,1])([-distanzaXAli,-distanzaYAli])(topWing);
