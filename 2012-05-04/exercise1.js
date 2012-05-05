@@ -29,11 +29,24 @@ var wing3dDomain = DOMAIN([[0,1],[0,1]])([30,30]);
 //var BEZ_topWing = BEZIER(S1)([cpt0,cpt1,cpt4]);
 var BEZ_topWing = BEZIER(S1)([cpt0,cpt1]);
 var topWing = MAP(BEZ_topWing)(wing3dDomain);
-DRAW(topWing);
+//DRAW(topWing);
+//copertura ali
+var f7 = BEZIER(S0)([[2,0,0]]);
+var cop = BEZIER(S1)([f7, cpt0]);
+cop = MAP(cop)(domain2);
+
+
+var f8 = BEZIER(S0)([[2,0,-12]]);
+var cop2 = BEZIER(S1)([f8, cpt1]);
+cop2 = MAP(cop2)(domain2);
+
+topWing = STRUCT([topWing,cop,cop2]);
 
 //bottomWing
 var bottomWing = T([0,1])([-distanzaXAli,-distanzaYAli])(topWing);
-DRAW(bottomWing);
+//DRAW(bottomWing);
+
+
 
 
 
@@ -60,4 +73,8 @@ var stecca4 = T([0,2])([3,-5])(stecche);
 //DRAW(stecca4);
 
 var barre = STRUCT([stecche,stecca2,stecca3,stecca4]);
-DRAW(barre);
+//DRAW(barre);
+
+
+var completeAli = STRUCT([barre,topWing,bottomWing]);
+DRAW(completeAli);

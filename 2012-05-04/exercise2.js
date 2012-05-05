@@ -48,26 +48,3 @@ var fusoliera = MAP(fusolieraMapping)(domain2);
 fusoliera = S([0,1,2])([2,2,2])(fusoliera);
 
 DRAW(fusoliera);
-/*
-var getBezierS0 = function (controls,n,draw){
-
-	var domain = INTERVALS(1)(n || 20);
-	var mapping = BEZIER(S0)(controls);
-
-	var c = MAP(mapping)(domain);
-	if(draw){
-		DRAW(c);
-	}
-
-	return c;
-}
-
-var drawBz0 = function(controls){
-	DRAW(getBezierS0(controls));
-}
-drawBz0(cp1);
-drawBz0(cp2);
-drawBz0(cp3);
-drawBz0(cp4);
-drawBz0(cp5);
-*/
