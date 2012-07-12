@@ -2,7 +2,7 @@
 
 // COLOURS
 var DARK_WOOD = [133/255,94/255,66/255];
-var GLASS = [164/255, 211/255, 238/255, 0.8];
+var GLASS = [164/255, 211/255, 238/255, 0.9];
 var MARBLE = [250/255,250/255,250/255];
 //var MARBLE = [230/255,228/255,216/255];
 
@@ -56,15 +56,21 @@ var b1WallWidth = b2WallWidth = 7;
 var eD = cD = b1 = 7;
 var b2D = 9;
 
-// windows
-var windowWidth = 1.5;
-var bigWindowHeight = 3;
-var lowWindowHeight = lWallHeight/2;
 
 // others
 var leftSideWidth = wallsThickness + cW + 6;
 
 //-------------------------------------------------------------------------------
+
+// WINDOWS
+var windowWidth = 1.5;
+var	windowThickness = 0.1;
+var littleWindowHeight = lWallHeight/3;
+var mediumWindowHeight = lWallHeight*3/4;
+
+
+//-------------------------------------------------------------------------------
+
 
 // FRONTDOOR
 var doorWidth = 3.25;
@@ -269,12 +275,50 @@ var buildDoor = function() {
 
 
 var buildWindows = function() {
+	var littleWindows = buildLittleWindows();
+	var mediumWindows = buildMediumWindows();
 
+	var leftWindows = STRUCT([littleWindows,mediumWindows]);
+	var rightWindows = S([0])([-1])(leftWindows).translate([0],[11*2+6+3+windowWidth*2+wallsThickness*2+stairsTotalWidth]) ;
+	var windows = STRUCT([leftWindows,rightWindows]);
+	windows = COLOR(GLASS)(windows);
+	DRAW(windows);
 }
 
+/*
+p: vertex low left
+side: true if window width is on y axis
+*/
+var buildGenericWindow = function (p,height,side) {
+	if(!side) {
+		var window = SIMPLEX_GRID([[-p[0],windowWidth],[-p[1],windowThickness],[-p[2],height]]);
+	}
+	else {
+		var window = SIMPLEX_GRID([[-p[0],windowThickness],[-p[1]+windowWidth,windowWidth],[-p[2],height]]);
+	}
+	return window;
+}
 
+var buildLittleWindows = function() {
 
-//-----------------------------------------------------------------------------------------------------------------------------------------
+	var wFrontLeft = buildGenericWindow([0.5,0,littleWindowHeight],littleWindowHeight);
+	var wFrontRight = T([0])([windowWidth+4.5+windowWidth+3+wallsThickness+1.5])(wFrontLeft);
+	var wSideExternalLeft = buildGenericWindow([0,wallsThickness+ 7 -0.5 ,littleWindowHeight],littleWindowHeight,true).translate([0],[-1]);
+	var wBack = T([0,1])([0.75,7+7+9+ 4*wallsThickness -windowThickness])(wFrontRight);
+
+	var littleWindows = STRUCT([wFrontLeft,wFrontRight,wSideExternalLeft,wBack]);
+
+	return littleWindows;
+}
+
+var buildMediumWindows = function() {
+	var wFrontBigLow = buildGenericWindow([0.5+ windowWidth+4.5,0,0],mediumWindowHeight);
+	var wSideExternalRight = buildGenericWindow([0,wallsThickness +0.5 +windowWidth,0],mediumWindowHeight,true).translate([0],[-1]);
+	
+	var mediumWindows = STRUCT([wFrontBigLow,wSideExternalRight]);
+
+	return mediumWindows;
+}
 
 var buildWall = function(p,width,depth,height) {
 	return SIMPLEX_GRID([[-p[0],width],[-p[1],depth],[-p[2],height]])
@@ -336,30 +380,20 @@ var buildFrontWalls = function() {
 	return frontWalls;
 }
 
-var getWallPiece = function() {
-	var lwFront1 = SIMPLEX_GRID([[0.5,-windowWidth,4.5,-windowWidth,1],[wallsThickness],[lWallHeight]]);
-	var lwFront2_1 = SIMPLEX_GRID([[-0.5,windowWidth],
-								 [wallsThickness],
-								 [lWallHeight/3,-lWallHeight/3,lWallHeight/3]]);
-	var lwFront2_2 = SIMPLEX_GRID([[-(0.5+windowWidth+4.5),windowWidth],
-								 [wallsThickness],
-								 [-lWallHeight*3/4,lWallHeight/4]]);
-	var mwFront1 = SIMPLEX_GRID([[0.5,-windowWidth,4.5,-windowWidth,1],[wallsThickness],[-lWallHeight,mWallHeight]]);
-	var mwFront2_1 = SIMPLEX_GRID([[-0.5,windowWidth],
-								 [wallsThickness],
-								 [-lWallHeight,mWallHeight/8,-mWallHeight/2,mWallHeight*3/8]]);
-	var mwFront2_3 = T([0])([4.5+windowWidth])(mwFront2_1);
-
-	var sideWallPiece = STRUCT([lwFront1,lwFront2_1,lwFront2_2,mwFront1,mwFront2_1,mwFront2_3]);
-
-	return sideWallPiece;
-}
 
 var buildSideWalls = function() {
-	// SIDE WALLS
-	var sideWall = getWallPiece();
-	sideWall = R([0,1])([-PI/2])(sideWall);
-	sideWall = T([0,1])([-wallsThickness,9])(sideWall);
+	var sideWallSmallWindowHeight = [lWallHeight/3,-lWallHeight/3,lWallHeight/3+mWallHeight/8,-mWallHeight/2,mWallHeight*3/8];
+	var sideWallBigWindowHeight = [-lWallHeight*3/4,lWallHeight/4+mWallHeight/8,-mWallHeight/2,mWallHeight*3/8];
+
+	var sideWallExternal1 = buildWall([0,0,0],wallsThickness,wallsThickness+0.5,lWallHeight+mWallHeight);
+	var sideWallExternalWindow1 = SIMPLEX_GRID([[wallsThickness],[-wallsThickness-0.5,windowWidth],sideWallBigWindowHeight]);
+	var sideWallExternal2 = buildWall([0,wallsThickness+0.5+windowWidth,0],wallsThickness,3,lWallHeight+mWallHeight);
+	var sideWallExternalWindow2 = SIMPLEX_GRID([[wallsThickness],[-wallsThickness -0.5 -windowWidth -3, windowWidth],sideWallSmallWindowHeight]);
+	var sideWallExternal3 = buildWall([0,wallsThickness+0.5+windowWidth+3+windowWidth,0],wallsThickness,0.5+wallsThickness,lWallHeight+mWallHeight);
+
+	var sideWallExternal = STRUCT([sideWallExternal1,sideWallExternalWindow1,sideWallExternal2,sideWallExternalWindow2,sideWallExternal3]);
+	sideWallExternal.translate([0],[-1]);
+
 	var rearSideWall = SIMPLEX_GRID([ [11+wallsThickness+3],[-8,wallsThickness],[lWallHeight+mWallHeight] ]);
 
 	var sideWallB1 = SIMPLEX_GRID([ [-11,+wallsThickness],
@@ -380,7 +414,7 @@ var buildSideWalls = function() {
 									 [lWallHeight+mWallHeight+hWallHeight] ]);
 	var sideWallB1_B2 = STRUCT([sideWallB1,sideWallB2,sideWallB12,sideWallB1_windows]);
 
-	sideWall = STRUCT([rearSideWall,sideWall,sideWallB1_B2]);
+	var sideWall = STRUCT([rearSideWall,sideWallExternal,sideWallB1_B2]);
 
 	return sideWall;
 }
@@ -415,27 +449,33 @@ var buildInternalWalls = function() {
 }
 
 var buildWalls = function() {
+
 	// BUILD LEFT HALF of the building walls
 	var frontWalls = buildFrontWalls();
 	var sideWalls = buildSideWalls();
 	var backWalls = buildBackWalls();
 	var internalWalls = buildInternalWalls();
 
+
 	//BUILD THE ENTIRE BUILDING WALLS
 	var leftHalfBuild = STRUCT([frontWalls,sideWalls,backWalls,internalWalls]);
 	var rightHalfWalls = T([0])([2*(leftSideWidth ) + stairsTotalWidth])( S([0])([-1])(leftHalfBuild) );
 	var walls = STRUCT([leftHalfBuild,rightHalfWalls]);
 
+	walls = COLOR([0.9,0.9,0.9,0.8])(walls);
+
 	DRAW(walls);
 };
 
-
+var buildFloors = function() {
+}
 
 var buildVilla = function(){
 	buildWalls();
 	buildColonnade();
 	buildFrames();
 	build2FlightOfSteps();
+	buildFloors();
 }
 
 
