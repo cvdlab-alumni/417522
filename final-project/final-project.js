@@ -1404,56 +1404,5 @@ function hermiteS1 (nubs1, nubs2, tan1, tan2) {
 
 
 /* ------------------------------------------ END ------------------------------------------*/
-//buildVilla();
+buildVilla();
 //DRAW(buildWalls());
-
-
-var curveWindows = function() {
-
-	var cpTopWindow = [[0,0,bigWindowHeight*3/4],[windowWidth/2,0,bigWindowHeight],[windowWidth,0,bigWindowHeight*3/4]];
-	var topWindowKnots = makeKnots(cpTopWindow);
-	var topWindowCurve = NUBS(S0)(2)(topWindowKnots)(cpTopWindow);
-	//var mapping = ROTATIONAL_SURFACE(topWindowCurve);
-
-	var curveMapping = CUBIC_HERMITE(S0)(cpTopWindow);
-	var curve = MAP(curveMapping)(INTERVALS(1)(20));
-
-	DRAW(topWindowCurve);
-	
-	//var middle = MAP(mappingMiddle)(domainR);
-}
-
-//  var c_arch_chiusura_ext = nubsS0(p_arch_chiusura_ext);
-  //  var c_arch_chiusura_int = nubsS0(p_arch_chiusura_int);
-
-    //var chiusura_ext = hermiteS1(c_arch_chiusura_ext,c_arch_ext, [0,0,0], [0,0,0]);
-    curveWindows();
-
-
-
-var cpTopWindow = [[0,0,bigWindowHeight*3/4],[windowWidth/2,0,bigWindowHeight*10/8],[windowWidth,0,bigWindowHeight*3/4]];
-var domain = INTERVALS(1)(32);
-var controlpoints = cpTopWindow;
-var curveMapping = BEZIER(S0)(controlpoints);
-var curve = MAP(curveMapping)(domain);
-DRAW(curve);
-
-DRAW(POLYLINE([[0,0,0],[0,0,bigWindowHeight*3/4],[windowWidth/2,0,bigWindowHeight],[windowWidth,0,bigWindowHeight*3/4],[windowWidth,0,0],[0,0,0]]))
-
-
-
-var domain = INTERVALS(1)(6);
-var controlpoints = [[0,0,bigWindowHeight*3/4],[windowWidth,0,bigWindowHeight*3/4],[windowWidth,0,0],[0,0,0],[0,0,bigWindowHeight*3/4]];
-var curveMapping = BEZIER(S0)(controlpoints);
-var curve = MAP(curveMapping)(domain);
-DRAW(curve);
-
-DRAW(POLYLINE(controlpoints));
-
-var domain = PROD1x1([INTERVALS(1)(16),INTERVALS(1)(16)]);
-var c0 = BEZIER(S0)([[0,0,0],[1,0,0]]);
-var c1 = BEZIER(S0)([[1,0,0],[1,0,1]]);
-var c2 = BEZIER(S0)([[1,0,1],[7,5,-1],[8,5,1],[12,4,0]]);
-var c3 = BEZIER(S0)([[0,6,0],[9,6,3],[10,6,-1]]);
-var out = MAP(BEZIER(S1)([c0,c1,c2,c3]))(domain);
-DRAW(out);
