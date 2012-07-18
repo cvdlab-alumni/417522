@@ -299,17 +299,37 @@ var buildFrames = function() {
 }
 
 var applyBoundaries = function(){
-	// FINESTRE APERTE
+	// FINESTRE
 	var a = applyBoundaryWood([0.5,0,lWallHeight/3],lWallHeight/3);
-
-	//FINESTRE CHIUSE
-
-	//PORTE
 
 
 	DRAW(a);
 }
 
+/* 
+lbV: left bottom vertex
+side: true if window width on x axis
+*/
+
+var applyBoundaryWood = function(lbV,windowHeight,side) {
+	if (!side) {
+		var bottomWood = SIMPLEX_GRID([[windowWidth],[blindThickness],[blindHeight]]);	
+		var sideWoodLeft = SIMPLEX_GRID([[blindThickness],[blindThickness],[-blindHeight,windowHeight-2*blindThickness]]);	
+		var sideWoodRight = T([0])([windowWidth-blindThickness])(sideWoodLeft);
+		var topWood = T([2])([windowHeight -blindThickness])(bottomWood);
+	}
+	else {
+		var bottomWood = SIMPLEX_GRID([[blindThickness],[windowWidth],[blindHeight]]);	
+		var sideWoodLeft = SIMPLEX_GRID([[blindThickness],[blindThickness],[-blindHeight,windowHeight-2*blindThickness]]);	
+		var sideWoodRight = T([0])([windowWidth-blindThickness])(sideWoodLeft);
+		var topWood = T([2])([windowHeight -blindThickness])(bottomWood);
+	}
+	
+	var blind = STRUCT([bottomWood,sideWoodLeft,sideWoodRight,topWood]).translate([0,1,2],[lbV[0],lbV[1]-blindThickness,lbV[2]]);
+	blind = COLOR(DARK_WOOD)(blind);
+
+	return blind;
+}
 /* ------------------------------------------ DOORS ------------------------------------------*/
 
 var buildDoors = function() {
@@ -556,27 +576,7 @@ var build1x1Windows = function() {
 	return w1x1;
 }
 
-/* 
-lbV: left bottom vertex
-side: true if window width on x axis
-*/
 
-var applyBoundaryWood = function(lbV,windowHeight,side) {
-	if (!side) {
-		var bottomWood = SIMPLEX_GRID([[windowWidth],[blindThickness],[blindHeight]]);	
-		var sideWoodLeft = SIMPLEX_GRID([[blindThickness],[blindThickness],[-blindHeight,windowHeight-2*blindThickness]]);	
-		var sideWoodRight = T([0])([windowWidth-blindThickness])(sideWoodLeft);
-		var topWood = T([2])([windowHeight -blindThickness])(bottomWood);
-	}
-	else {
-
-	}
-	
-	var blind = STRUCT([bottomWood,sideWoodLeft,sideWoodRight,topWood]).translate([0,1,2],[lbV[0],lbV[1]-blindThickness,lbV[2]]);
-	blind = COLOR(DARK_WOOD)(blind);
-
-	return blind;
-}
 
 
 
@@ -587,11 +587,12 @@ var buildWalls = function() {
 	// BUILD LEFT HALF of the building walls
 	var lowWalls = buildLowWalls();
 	var middleWalls = buildMiddleWalls();
+	var curveWalls = buildCurveWalls();
 	var cornices = buildCornices();
 	var highWalls = buildHighWalls();
 	var internalWalls = buildInternalWalls();
 
-	var leftHalfBuild = STRUCT([lowWalls,middleWalls,cornices,highWalls,internalWalls]);
+	var leftHalfBuild = STRUCT([lowWalls,middleWalls,cornices,highWalls,internalWalls,curveWalls]);
 	var walls = duplicate(leftHalfBuild);
 
 	DRAW(walls);
@@ -952,9 +953,10 @@ var buildGutta = function (dim) {
 var buildColonnade = function() {
 	var leftColumns = buildColumns();
 	var leftArch = buildArchs();
-	var leftTerrace = buildTerrace();
+	var leftFrontTerrace = buildTerrace();
+	var leftBackTerrace = buildTerrace().rotate([0,1],[PI]).translate([0,1],[stairsTotalWidth,colonnadeDepth+28.5]);
 
-	var colonnade = STRUCT([leftColumns,leftArch,leftTerrace]);
+	var colonnade = STRUCT([leftColumns,leftArch,leftFrontTerrace,leftBackTerrace]);
 	colonnade = duplicate(colonnade);
 
 	var baseColonnade = SIMPLEX_GRID([[colonnadeWidth],[-tStairs,colonnadeDepth],[hStairs]]);
@@ -1401,8 +1403,61 @@ function hermiteS1 (nubs1, nubs2, tan1, tan2) {
   return surface;
 }
 
+var domain = INTERVALS(1)(32);
+var ddom = DOMAIN([[0,1],[0,1]])([50,10]);
+
+var buildCurveWalls = function() {
+	var front1st = buildCurveWall([0.5,0,lWallHeight+mWallHeight/12]);
+	var front2nd = buildCurveWall([6.5,0,lWallHeight+mWallHeight/12]);
+	var front3rd = buildCurveWall([13.5,0,lWallHeight+mWallHeight/12]);
+	var frontColonnade1st = buildCurveWall([19.8,0,lWallHeight+mWallHeight/12]);
+	var back1st = buildCurveWall([19.75,21,lWallHeight+mWallHeight/12]);
+	var back2nd = buildCurveWall([22,21,lWallHeight+mWallHeight/12]);
+
+	var side1st = buildCurveWall([0,3,lWallHeight+mWallHeight/12],true).translate([0],[-1]);
+	var side2nd = buildCurveWall([0,7.5,lWallHeight+mWallHeight/12],true).translate([0],[-1]);
+	var side3rd = buildCurveWall([11,13.25,lWallHeight+mWallHeight/12],true);
+	var side4th = buildCurveWall([11,19,lWallHeight+mWallHeight/12],true);
+	var side5th = buildCurveWall([11,22,lWallHeight+mWallHeight/12],true);
+	var side6th = buildCurveWall([11,25,lWallHeight+mWallHeight/12],true);
+
+	var curveWalls = STRUCT([front1st,front2nd,front3rd,frontColonnade1st,back1st,back2nd,side1st,side2nd,side3rd,side4th,side5th,side6th]);
+	return curveWalls;
+}
+
+var buildCurveWall = function(p,side) {
+
+	var cpTopWindow = [[0,0,bigWindowHeight*3/4],[windowWidth/2,0,bigWindowHeight*10/8],[windowWidth,0,bigWindowHeight*3/4]];
+
+	// curva 1
+	var curveMapping = BEZIER(S0)(cpTopWindow);
+	var curve1 = MAP(curveMapping)(domain);
+	// muro mancante
+	var cp = [[0,0,bigWindowHeight],[windowWidth,0,bigWindowHeight]];
+	var cpMapping = BEZIER(S0)(cp);
+	var curveWall2dFront = MAP(NUBS(S1)(1)([0,0,3,3])([curveMapping,cpMapping]))(ddom);
+	var curveWall2dBack = T([1])([wallsThickness])(curveWall2dFront);
+
+	var vectorCurveWall = [0,wallsThickness,0];
+	var curveWallDepth = MAP(  CYLINDRICAL_SURFACE(curveMapping)(vectorCurveWall)  )(  ddom  );
+
+	var curveWall = STRUCT([curveWall2dFront,curveWall2dBack,curveWallDepth]);
+
+
+	if (side) {
+		curveWall.rotate([0,1],[PI/2]).translate([0,1],[wallsThickness,-windowWidth]);
+		//curveWall.translate([0,1,2],[p[1],p[0],p[2]]);
+	}
+	else {
+		
+	}
+curveWall.translate([0,1,2],[p[0],p[1],p[2]]);
+	
+	return curveWall;	
+	
+}
+
 
 
 /* ------------------------------------------ END ------------------------------------------*/
 buildVilla();
-//DRAW(buildWalls());
