@@ -954,7 +954,7 @@ var buildColonnade = function() {
 	var leftColumns = buildColumns();
 	var leftArch = buildArchs();
 	var leftFrontTerrace = buildTerrace();
-	var leftBackTerrace = buildTerrace().rotate([0,1],[PI]).translate([0,1],[stairsTotalWidth,colonnadeDepth+28.5]);
+	var leftBackTerrace = buildTerrace().rotate([0,1],[PI]).translate([1],[colonnadeDepth+28.5]);
 
 	var colonnade = STRUCT([leftColumns,leftArch,leftFrontTerrace,leftBackTerrace]);
 	colonnade = duplicate(colonnade);
