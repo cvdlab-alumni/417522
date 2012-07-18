@@ -1,7 +1,16 @@
 /*------------------------------   VARIABLES   ------------------------------*/
 //DOMAINS
+var domain1 = DOMAIN([[0,1],[0,1]])([20,20]);
 var roofDomain = DOMAIN([[0,1],[0,1]])([6,6]);
+//var columnDomain = DOMAIN([[0,1],[0,2*PI]])([40,30]);
+var columnDomain = DOMAIN([[0,1],[0,2*PI]])([20,15]);
+var domain2d = DOMAIN([[0,1],[0,1]])([50,1]);
+//var spiralDomain = DOMAIN([[0,1],[0,1]])([50,50]);
+var spiralDomain = DOMAIN([[0,1],[0,1]])([20,20]);
+var p = 10; // proportion
 
+var domain = INTERVALS(1)(32);
+var ddom = DOMAIN([[0,1],[0,1]])([50,10]);
 
 // COLORS
 var DARK_WOOD = [133/255,94/255,66/255];
@@ -11,7 +20,10 @@ var BURLY_WOODS = [139/255,119/255,101/255];
 var ROOF = 	[0.8,0.51,0.4];
 var WHITE_TIMPANO = 	[1,0.94,0.86];
 //var MARBLE = [230/255,228/255,216/255];
-
+var hue = [1/255,230/255,240/255];
+var bColor = [1,1,0.9];
+var beige_mura = [0.992,0.96,0.901];
+var grigio_colonna = [0.960,0.960,0.960];
 
 //-------------------------------------------------------------------------------
 
@@ -45,7 +57,7 @@ m: medium, l: low
 // heights
 var lWallHeight = hStairs;
 var mWallHeight = 7;
-var corniceHeight = 3;
+var corniceHeight = 2;
 var hWallHeight = 7;
 var hwAltitude = lWallHeight +mWallHeight +corniceHeight;
 var highCorniceHeight = mWallHeight*3/24;
@@ -118,11 +130,8 @@ var highPartColumnBase = 0.04;
 var columnBaseHeight = highPartColumnBase*11;
 
 // COLONNE DARIO
-//var domainR = DOMAIN([[0,1],[0,2*PI]])([40,30]);
-var domainR = DOMAIN([[0,1],[0,2*PI]])([20,15]);
-var domain2d = DOMAIN([[0,1],[0,1]])([50,1]);
-var bColor = [1,1,0.9];
-var hColumn = mWallHeight -columnBaseHeight; // - capitalHeight
+var capitalHeight = 1;
+var hColumn = mWallHeight -columnBaseHeight -capitalHeight;
 var rColumn = 0.4;
 
 
@@ -138,10 +147,6 @@ var poleAndDistance = (stairsTotalWidth-6*cubeWidth-2*incognite)/27;
 var poleDiameter = (poleAndDistance)*3/4;
 var polesDistance = (poleAndDistance)/4;
 
-
-
-//var deltaColumns = (stairsTotalWidth -12*rColumn)/5;  // distance between each column
-//var deltaColumns = 6*poleDiameter+5*polesDistance;  // distance between each column
 var deltaColumns = 5*poleAndDistance;  // distance between each column
 
 
@@ -174,6 +179,7 @@ var externalStraightPartWidth = 11-0.5-windowWidth-2.25;
 
 // guttam
 var nGuttam = 35; // number of guttam
+var nDiagonalGuttam = 20;
 var nSpaces = 37; // number of spaces between guttam (even external)
 // NB dim gutta = dim space
 var guttaWidth = tympanumWidth/(nGuttam+nSpaces);
@@ -193,11 +199,51 @@ var duplicate = function(leftHalf) {
 	return entire;
 }
 
+var makeKnotsColumns = function(cardP, gradoC) { //TODO TOGLIERE
+	var knotsC = cardP + gradoC + 1;
+	var knots = [0,0,0];
+	for(var i = 0; i < (knotsC - 3 - 3); i++) {
+		knots.push(i+1);
+	}
+
+	knots.push(i+1);
+	knots.push(i+1);
+	knots.push(i+1);
+
+	return knots;
+};
+
+//given a list of controlPoints returns the relatives knots for a bidimensional NUBS
+var makeKnots = function(points){
+	var knots = [0,0,0];
+	var tot = points.length;
+	for(var i=1;i<=tot-3;i++)
+		knots.push(i);
+	knots.push(i);
+	knots.push(i);
+	knots.push(i);
+	return knots;
+}
+
+//funzione che prepara la nubs a partire dai punti di controllo, per poi usarla in s1
+function nubsS0 (controlpoints) {
+  var curveKnots = makeKnots(controlpoints);
+  var spline = NUBS(S0)(2)(curveKnots)(controlpoints);
+  return spline;
+}
+//Funzione che, date due nubs s0 , le adopera come argomento di una hermite s1
+function hermiteS1 (nubs1, nubs2, tan1, tan2) {
+  var controlpoints = [nubs1, nubs2, tan1, tan2];
+  var sur = CUBIC_HERMITE(S1)(controlpoints);
+  var surface = MAP(sur)(domain1);
+  return surface;
+}
+
 /* ------------------------------------------ STAIRS ------------------------------------------*/
 
 /*
 build a single step
-vertexDL: vertex in basso a sinistra del rettangolo
+vertexDL: left low vertex of the rectangle
 */
 var buildStep = function(vertexDL,width,height,thickness) {
  	var x = vertexDL[0];
@@ -457,7 +503,7 @@ var buildWindows = function() {
 	var leftWindows = STRUCT([littleWindows,bigWindows,w1x1,backWindows,externalLittleWindows,rearWindows]);
 	var rightWindows = S([0])([-1])(leftWindows).translate([0],[11*2+6+3+windowWidth*2+wallsThickness*2+stairsTotalWidth]) ;
 	var windows = STRUCT([leftWindows,rightWindows]);
-	windows = COLOR(GLASS)(windows);
+	windows = (COLOR(GLASS)(windows));
 	DRAW(windows);
 }
 
@@ -472,7 +518,7 @@ var buildGenericWindow = function (p,height,side) {
 	else {
 		var w = SIMPLEX_GRID([[-p[0],windowThickness],[-p[1]+windowWidth,windowWidth],[-p[2],height]]);
 	}
-	return w;
+	return BOUNDARY(w);
 }
 
 // height: lWallHeight/3 = 1.08
@@ -545,8 +591,13 @@ var buildBigWindows = function () {
 
 	// FRONT WALL
 	var mFrontLeft = buildGenericWindow([0.5,0,lWallHeight+mWallHeight*2/24],h);
+	var mFrontCurveLeft = buildCurveWindow().translate([0,2],[0.5,lWallHeight+mWallHeight*2/24]);
+	var mFrontCurveCenter = T([0])([4.5+windowWidth])(mFrontCurveLeft);
 	var mFrontCenter = T([0])([4.5+windowWidth])(mFrontLeft);
 	var mFrontRight = T([0])([windowWidth+3+wallsThickness+1.5])(mFrontCenter);
+	var mFrontCurveRight = T([0])([windowWidth+3+wallsThickness+1.5])(mFrontCurveCenter);
+
+
 	var hFrontRight = T([2])([mWallHeight+corniceHeight -mWallHeight*2/24 ])(mFrontRight);
 	var mFrontColonnade = T([0])([windowWidth+3.05+wallsThickness+ columnDistance])(mFrontRight);
 	var hFrontColonnade = T([2])([mWallHeight+corniceHeight -mWallHeight*2/24])(mFrontColonnade);
@@ -562,7 +613,7 @@ var buildBigWindows = function () {
 
 	
 	var bigWindows = STRUCT([wSideLowRight,wSideLowCenterRight,wSideLowCenterLeft,wSideLowLeft,wSideMediumRight,wSideMediumCenterRight,wSideMediumCenterLeft,
-							wExternalSideLeft,wExternalSideRight, mFrontLeft,mFrontCenter,mFrontRight,hFrontRight,mFrontColonnade,hFrontColonnade,
+							wExternalSideLeft,wExternalSideRight, mFrontCurveLeft,mFrontCurveCenter,mFrontCurveRight,hFrontRight,mFrontColonnade,hFrontColonnade,
 							mBackColonnadeLeft,mBackColonnadeRight,hBackColonnadeLeft,hBackColonnadeRight]);
 	return bigWindows;
 }
@@ -850,7 +901,7 @@ var cornicePedimentThickness = 0.1;
 var cornicePedimentHeight = 0.1;
 var buildPediment = function() {
 	var lowCornice = CUBOID([tympanumWidth,cornicePedimentThickness,cornicePedimentHeight]);
-	var guttam = buildGuttam().translate([2],[-guttaHeight]);
+	var guttam = buildGuttam().translate([1,2],[-guttaWidth,-guttaHeight]);
 
 	var pediment = STRUCT([lowCornice,guttam]).translate([0,1,2],[6+11+wallsThickness,-colonnadeDepth+sporgenza,
 												totalWallHeight+corniceHeight+subTympanumCorniceHeight-cornicePedimentHeight]);
@@ -893,7 +944,6 @@ var buildHorizontalRoofs = function() {
 	var horizontalRoofs = STRUCT([externalRoof,centralRoof]);
 	horizontalRoofs = COLOR(ROOF)(horizontalRoofs);
 	return horizontalRoofs;
-	//return centralRoof;
 }
 
 var buildHorizontalRoof = function(horizontalRoofWidth,horizontalRoofDepth,horizontalRoofHeight,straightPartWidth) {
@@ -928,17 +978,29 @@ var buildHorizontalRoof = function(horizontalRoofWidth,horizontalRoofDepth,horiz
 	return horizontalRoof;
 }
 
-
 var buildGuttam = function() {
+	// horizontal guttam
 	var g = buildGutta(guttaWidth);
-	var guttam = STRUCT([g]);
+	var hGuttam = STRUCT([g]);
 
 	var i = 1;
 	while (i<nGuttam) {
-		guttam = STRUCT([guttam,T([0])([i*2*guttaWidth])(g)]);
+		hGuttam = STRUCT([hGuttam,T([0])([i*2*guttaWidth])(g)]);
 		i++;
 	}
 
+	//left guttam
+	i=1;
+	var dGuttam = STRUCT([g]).translate([0],[6*guttaWidth]);
+	while (i<nDiagonalGuttam) {
+		dGuttam = STRUCT([dGuttam,T([0])([i*2*guttaWidth])(g)]);
+		i++;
+	}
+	dGuttam.rotate([0,2],[-PI/8]);
+	hGuttam.translate([0],[2*guttaWidth]);
+	var rightGuttam = S([0])([-1])(dGuttam).translate([0],[tympanumWidth]);
+
+	var guttam = STRUCT([hGuttam,dGuttam,rightGuttam]);
 	return guttam;
 }
 
@@ -953,10 +1015,10 @@ var buildGutta = function (dim) {
 var buildColonnade = function() {
 	var leftColumns = buildColumns();
 	var leftArch = buildArchs();
-	var leftFrontTerrace = buildTerrace();
-	var leftBackTerrace = buildTerrace().rotate([0,1],[PI]).translate([1],[colonnadeDepth+28.5]);
+	var leftTerrace = buildTerrace();
+	
 
-	var colonnade = STRUCT([leftColumns,leftArch,leftFrontTerrace,leftBackTerrace]);
+	var colonnade = STRUCT([leftColumns,leftArch,leftTerrace]);
 	colonnade = duplicate(colonnade);
 
 	var baseColonnade = SIMPLEX_GRID([[colonnadeWidth],[-tStairs,colonnadeDepth],[hStairs]]);
@@ -986,6 +1048,8 @@ var buildColumns = function() {
 }
 
 
+/* ------------------------------------------ TERRACE ------------------------------------------*/
+
 var buildTerrace = function() {
 
 	var cube = CUBOID([cubeWidth,cubeWidth,cubeHeight]);
@@ -1005,9 +1069,13 @@ var buildTerrace = function() {
 
 	var poles = STRUCT([leftPoles,centerPoles,rightPoles]);
 
-	var terrace = STRUCT([cubes,rows,terraceFloor,poles]).translate([0,1,2],[11+6+wallsThickness+0.1,-colonnadeDepth-0.5,hwAltitude-cubeWidth]);
+	var frontTerrace = STRUCT([cubes,rows,terraceFloor,poles]);
+	var backTerrace = R([0,1])([PI])(frontTerrace).translate([0,1],[stairsTotalWidth-2*incognite,2*colonnadeDepth+27]);
 
-	return (terrace);
+	var terrace = STRUCT([frontTerrace,backTerrace]);
+	terrace.translate([0,1,2],[11+6+wallsThickness+0.1,-colonnadeDepth-0.5,hwAltitude-cubeWidth]);
+
+	return terrace;
 }
 
 var buildPoles = function(i) {
@@ -1035,20 +1103,20 @@ var buildPole = function() {
 	var topKnots = makeKnots(cpTop);
 	var topCurve = NUBS(S0)(2)(topKnots)(cpTop);
 	var mappingTop = ROTATIONAL_SURFACE(topCurve);
-	var top = MAP(mappingTop)(domainR);
+	var top = MAP(mappingTop)(columnDomain);
 
 	var cpBody = [[poleDiameter/3,0,0.45],[poleDiameter/6,0,0.4],[poleDiameter/6,0,0.35],[poleDiameter/3,0,0.25],[poleDiameter/2,0,0.15],[poleDiameter/3,0,0.05]];
 
 	var bodyKnots = makeKnots(cpBody);
 	var bodyCurve = NUBS(S0)(2)(bodyKnots)(cpBody);
 	var mappingBody = ROTATIONAL_SURFACE(bodyCurve);
-	var body = MAP(mappingBody)(domainR);
+	var body = MAP(mappingBody)(columnDomain);
 
 	var cpMiddle = [[poleDiameter/3,0,0.05],[poleDiameter/2,0,0],[poleDiameter/3,0,-0.05]];
 	var middleKnots = makeKnots(cpMiddle);
 	var middleCurve = NUBS(S0)(2)(middleKnots)(cpMiddle);
 	var mappingMiddle = ROTATIONAL_SURFACE(middleCurve);
-	var middle = MAP(mappingMiddle)(domainR);
+	var middle = MAP(mappingMiddle)(columnDomain);
 
 	var topHalf = STRUCT([top,body]);
 	var bottomHalf = S([2])([-1])(topHalf);
@@ -1058,7 +1126,7 @@ var buildPole = function() {
 }
 
 var buildColumn = function() {
-	//var capital = buildCapital();
+	var capital = buildCapital();
 	var body = buildColumnBody();
 	var base = buildColumnBase();
 
@@ -1068,17 +1136,18 @@ var buildColumn = function() {
 	return column;
 }
 
+var getCapitalControlPoints = function(radius) {
+	var radius = radius || 0.8;
+	var controlPoints = [];
 
-//given a list of controlPoints returns the relatives knots for a bidimensional NUBS
-var makeKnots = function(points){
-	var knots = [0,0,0];
-	var tot = points.length;
-	for(var i=1;i<=tot-3;i++)
-		knots.push(i);
-	knots.push(i);
-	knots.push(i);
-	knots.push(i);
-	return knots;
+	var i = 0;
+	var angle = PI/4;
+
+	for (i = 0; i < 24; i++) {
+		controlPoints.push( [radius * ( COS(i*angle) + i*SIN(i*angle)  ), radius * ( SIN(i*angle) - i*COS(i*angle)  ), 0] );
+	}
+
+	return controlPoints;
 }
 
 
@@ -1096,7 +1165,7 @@ var buildColumnBase = function() {
 	var subColumnBodyCurve = NUBS(S0)(2)(knots)(points);
 
 	var mappingBase = ROTATIONAL_SURFACE(subColumnBodyCurve);
-	var base = MAP(mappingBase)(domainR);
+	var base = MAP(mappingBase)(columnDomain);
 	var lowBase = SIMPLEX_GRID([[1],[1],[4*highPartColumnBase]]).translate([0,1,2],[-0.5,-0.5,-10*highPartColumnBase]);
 	base = STRUCT([base,lowBase]).translate([2],[10*highPartColumnBase]);
 	base = COLOR(bColor)(base);
@@ -1104,143 +1173,66 @@ var buildColumnBase = function() {
 }
 
 
-//builds the column's capital
-var buildCapital = function(){
-	var capitalHeight = 16;
-	var capitalDepth = 0.6;
-	var capital = [];
-	var points = [[3,4,0],[3,6,0],[5,7.5,0],[8,6,0],[8,2,0],[5,0,0],[1,1,0],[-0.5,4,0],[0,7,0],[2,9,0],[6,9.5,0],[9,8,0],[10.5,4,0],[9.5,0.5,0],[7,-2,0],[-1,-1,0],[-3.5,4,0],[-2,9,0],[2,12.5,0],[8,13,0],[20,13,0]];
+var buildCapital = function() {
+	var heightReference = 0.745;
 
-	var knots = makeKnots(points);
-	var center = [5,4,0];
-	var spes = 0.8;
-	var points2 = points.map(function(p){return [ spes*p[0] + (1-spes)*center[0], spes*p[1] + (1-spes)*center[1], 0 ]});
-	var curve = NUBS(S0)(2)(knots)(points);
-	var curve2 = NUBS(S0)(2)(knots)(points2);
-	var capit = BEZIER(S1)([curve,curve2]);
-	var frontSurface1 = MAP(capit)(domain2d);
-	capital.push(frontSurface1);
-	var latSurface = [];
-	var latSurface2 = [];
-	latSurface.push(curve);
-	latSurface2.push(curve2);
+	var prof1 = NUBS(S1)(2)(makeKnotsColumns(24,2))(getCapitalControlPoints());
 
-	var points = points.map(function(p){return [p[0],p[1],p[2]+capitalHeight]});
-	var points2 = points2.map(function(p){return [p[0],p[1],p[2]+capitalHeight]});
-	var curve = NUBS(S0)(2)(knots)(points);
-	var curve2 = NUBS(S0)(2)(knots)(points2);
-	var capit2 = BEZIER(S1)([curve,curve2]);
-	var frontSurface2 = MAP(capit2)(domain2d);
-	capital.push(frontSurface2);
-	latSurface.push(curve);
-	latSurface2.push(curve2);
+	var prof2 = NUBS(S0)(2)(makeKnotsColumns(8,2))([[0.015,0,0],[0.01,0,0.001],[0,0,0.15],
+		[0.015,0,0.29],
+		[0.02,0,0.3],[0.025,0,0.29],[0.03,0,0.001],[0.025,0,0]]);
 
-	var latSurface = BEZIER(S1)(latSurface);
-	var latSurface = MAP(latSurface)(domain2d);
-	capital.push(latSurface);
-	var latSurface2 = BEZIER(S1)(latSurface2);
-	var latSurface2 = MAP(latSurface2)(domain2d);
-	capital.push(latSurface2);
+	var spiral = MAP(PROFILEPROD_SURFACE([prof2,prof1]))(spiralDomain);
 
-	var center = [5,4,capitalDepth];
-	var pointsProfile = points2.map(function(p){return [p[0],p[1],p[2] - capitalHeight+ capitalDepth]});
-	var curve = NUBS(S0)(2)(knots)(pointsProfile);
+	// center
+	var spiralCenter = NUBS(S0)(2)(makeKnotsColumns(4,2))([[-0.015*p,0,0],[-0.005*p,0,0.015*p],[-0.005*p,0,0.03*p],[0,0,0.03*p]]);
+	spiralCenter = MAP(ROTATIONAL_SURFACE(spiralCenter))(DOMAIN([[0,1],[0,2*PI]])([10,50])); // TODO
 
-	var fakePoint = BEZIER(S0)([center,center]);
-	var filling = BEZIER(S1)([fakePoint, curve]);
-	var filling = MAP(filling)(domain2d);
-	capital.push(filling);
+	// tail
+	var lengthCapital1 = NUBS(S0)(2)(makeKnotsColumns(24,2))(
+			AA(function (elem) { return [elem[0]*0.025,elem[1]*0.025,elem[2]*0.025];})(getCapitalControlPoints())
+		);
+	var lengthCapital2 = NUBS(S0)(2)(makeKnotsColumns(24,2))( 
+			AA(function (elem) { return [elem[0]*0.021,elem[1]*0.021,elem[2]*0.021-0.01];})(getCapitalControlPoints())
+		);
+	var lengthCapital3 = NUBS(S0)(2)(makeKnotsColumns(24,2))( 
+			AA(function (elem) { return [elem[0]*0.020,elem[1]*0.020,elem[2]*0.020-0.6];})(getCapitalControlPoints())
+		);
 
-	var center = [5,4,capitalHeight - capitalDepth];
-	var pointsProfile = points2.map(function(p){return [p[0],p[1],p[2] - capitalDepth]});
-	var curve = NUBS(S0)(2)(knots)(pointsProfile);
-
-	var fakePoint = BEZIER(S0)([center,center]);
-	var filling = BEZIER(S1)([fakePoint, curve]);
-	var filling = MAP(filling)(domain2d);
-	capital.push(filling);
+	var lengthCapital = BEZIER(S1)([lengthCapital1,lengthCapital2,lengthCapital3]);
+	lengthCapital = MAP(lengthCapital)(DOMAIN([[0,1],[0,1]])([50,10])); // TODO
 
 
-	//otherside
-	var l = 30;
-	var points = [[3,4,0],[3,6,0],[5,7.5,0],[8,6,0],
-					[8,2,0],[5,0,0],[1,1,0],[-0.5,4,0],
-					[0,7,0],[2,9,0],[6,9.5,0],[9,8,0],
-					[10.5,4,0],[9.5,0.5,0],[7,-2,0],[-1,-1,0],
-					[-3.5,4,0],[-2,9,0],[2,12.5,0],[8,13,0],[20,13,0]];
+	// center piece
+	prof1 = NUBS(S0)(2)(makeKnotsColumns(4,2))([ [0,0,0],[0.0105*p,0,-0.002*p],[0.0095*p,0,0.0115*p],[0,0,0.01*p] ]);
 
-	var points = points.map(function(p){return [- p[0] + l , p[1],p[2]]});
+	prof2 = NUBS(S0)(2)(makeKnotsColumns(4,2))([ [0,0.05*p,0],[0.0105*p,0.06*p,-0.002*p],[0.0095*p,0.06*p,0.0115*p],[0,0.06*p,0.01*p] ]);
 
-	var knots = makeKnots(points);
-	var center = [5+l-7,4,0];
-	var capitalOthersideDepth = 0.8;
-	var points2 = points.map(function(p){return [ capitalOthersideDepth*p[0] + (1-capitalOthersideDepth)*center[0], capitalOthersideDepth*p[1] + (1-capitalOthersideDepth)*center[1], 0 ]});
-	var curve = NUBS(S0)(2)(knots)(points);
-	var curve2 = NUBS(S0)(2)(knots)(points2);
-	var capit = BEZIER(S1)([curve,curve2]);
-	var frontSurface1 = MAP(capit)(domain2d);
-	capital.push(frontSurface1);
-	var latSurface = [];
-	var latSurface2 = [];
-	latSurface.push(curve);
-	latSurface2.push(curve2);
+	var centerCapital = MAP(BEZIER(S1)([prof2,prof1]))(DOMAIN([[0,1],[0,1]])([20,20]));
 
-	var points = points.map(function(p){return [p[0],p[1],p[2]+capitalHeight]});
-	var points2 = points2.map(function(p){return [p[0],p[1],p[2]+capitalHeight]});
-	var curve = NUBS(S0)(2)(knots)(points);
-	var curve2 = NUBS(S0)(2)(knots)(points2);
-	var capit2 = BEZIER(S1)([curve,curve2]);
-	var frontSurface2 = MAP(capit2)(domain2d);
-	capital.push(frontSurface2);
-	latSurface.push(curve);
-	latSurface2.push(curve2);
-
-	var latSurface = BEZIER(S1)(latSurface);
-	var latSurface = MAP(latSurface)(domain2d);
-	capital.push(latSurface);
-	var latSurface2 = BEZIER(S1)(latSurface2);
-	var latSurface2 = MAP(latSurface2)(domain2d);
-	capital.push(latSurface2);
-
-	var center = [5+l-7,4,capitalOthersideDepth];
-	var pointsProfile = points2.map(function(p){return [p[0],p[1],p[2] - capitalHeight+ capitalOthersideDepth]});
-	var curve = NUBS(S0)(2)(knots)(pointsProfile);
-
-	var fakePoint = BEZIER(S0)([center,center]);
-	var filling = BEZIER(S1)([fakePoint, curve]);
-	var filling = MAP(filling)(domain2d);
-	capital.push(filling);
-
-	var center = [5+l-7,4,capitalHeight - capitalOthersideDepth];
-	var pointsProfile = points2.map(function(p){return [p[0],p[1],p[2] - capitalOthersideDepth]});
-	var curve = NUBS(S0)(2)(knots)(pointsProfile);
-
-	var fakePoint = BEZIER(S0)([center,center]);
-	var filling = BEZIER(S1)([fakePoint, curve]);
-	var filling = MAP(filling)(domain2d);
-	capital.push(filling);
+	centerCapital.translate([0,1,2],[0.090*p,0.025*p,(heightReference-0.018)*p]);
 
 
+	var capital = STRUCT([ spiral, spiralCenter.translate([0,1],[-0.009,0.015]), lengthCapital, ]);
 
-	var base = T([1])([4.2])(SIMPLEX_GRID([[-8,14],[6.2],[-capitalOthersideDepth,capitalHeight-2*capitalOthersideDepth]]));
-	var torusSurface = R([1,2])([PI/2])(TORUS_SURFACE([3, 6.5])([50,10]));
-	var torusSurface = T([0,1,2])([15,6,8])(torusSurface);
+	capital.rotate([0,2],[PI/2]);
+	capital.rotate([1,2],[-PI/12]);
+	capital.scale([0,1,2],[0.5,0.5,0.5]);
+	var capital2 = S([0])([-1])(capital);
+	capital.translate([0,1,2],[0.085*p,0.090*p,(heightReference-0.028)*p]);
+	capital2.translate([0,1,2],[0.025*p,0.090*p,(heightReference-0.028)*p]);
+	var capital3 = S([1])([-1])(capital2);
+	capital3.translate([1],[0.11*p]);
+	var capital4 = S([1])([-1])(capital);
+	capital4.translate([1],[0.11*p]);
 
-	capital.push(base);
-	capital.push(torusSurface);
+	var capital = STRUCT([ capital, capital2, capital3, capital4, centerCapital, (S([0])([-1])(centerCapital)).translate([0],[0.11*p]) ]);
 
-	var capital = STRUCT(capital);
-
-	var capital = S([0,1,2])([0.3,0.15,0.3])(capital);
-	capital = T([1])([-0.77])(capital);
-
-	/*POSITIONING*/
-	capital.rotate([1,2],[PI/2]);
-	capital.scale([0,1,2],[0.2,0.2,0.2]);
-	capital.translate([0,2],[-1,hColumn]);
-
-	capital = COLOR(bColor)(capital);
+	capital.translate([0,1,2],[-0.5,-0.5,-1.25]);
+	capital.rotate([0,1],[PI/2]);
+	capital.scale([0,1,2],[1.8,1.2,1.6]).translate([0,1,2],[0.1,-0.05,-3.8]);
 	return capital;
+
 }
 
 
@@ -1248,9 +1240,8 @@ var buildColumnBody = function(){
 	var points = [[rColumn, 0, 0],[rColumn*6.3/5,0,1/3*hColumn],[rColumn,0,hColumn]];
 	var pColumn = NUBS(S0)(2)([0,0,0,1,1,1])(points);
 	var mappingColumn = ROTATIONAL_SURFACE(pColumn);
-	var column = MAP(mappingColumn)(domainR);
+	var column = MAP(mappingColumn)(columnDomain);
 
-	//column.translate([1],[-rColumn])
 	column.translate([2,],[columnBaseHeight]);
 	column = COLOR(bColor)(column);
 
@@ -1259,22 +1250,22 @@ var buildColumnBody = function(){
 
 
 var buildArchs = function(){
-  var basamento1 = CUBOID([4,1,0.28]);
-  var basamento_sottoarch = T([0,1,2])([0,0.07,0.279999])(CUBOID([3.93,0.73,0.76]));
-  var pilastro_arch1 = T([0,1,2])([3.18,0.07,1.039999])(CUBOID([0.75,0.73,3.44]));
-  var pilastro_arch2 = T([0,1,2])([0,0.07,1.039999])(CUBOID([0.75,0.73,3.44]));
-  var anello1 = T([0,1,2])([3.08,-0.03,4.479999])(CUBOID([0.93,0.91,0.26]));
-  var anello2 = T([0,1,2])([-0.10,-0.03,4.479999])(CUBOID([0.93,0.91,0.26]));
+  var basement1 = CUBOID([4,1,0.28]);
+  var basement2 = T([0,1,2])([0,0.07,0.279999])(CUBOID([3.93,0.73,0.76]));
+  var pillar_arch1 = T([0,1,2])([3.18,0.07,1.039999])(CUBOID([0.75,0.73,3.44]));
+  var pillar_arch2 = T([0,1,2])([0,0.07,1.039999])(CUBOID([0.75,0.73,3.44]));
+  var ring1 = T([0,1,2])([3.08,-0.03,4.479999])(CUBOID([0.93,0.91,0.26]));
+  var ring2 = T([0,1,2])([-0.10,-0.03,4.479999])(CUBOID([0.93,0.91,0.26]));
  
 
   var curvePart = buildCurveArchPart().translate([1,2],[0.07,4.74]);
-  var lowerArch = STRUCT([basamento1, basamento_sottoarch, pilastro_arch1, pilastro_arch2, anello1, anello2, curvePart]);
+  var lowerArch = STRUCT([basement1, basement2, pillar_arch1, pillar_arch2, ring1, ring2, curvePart]);
+  lowerArch = R([0,1])([-PI/2])(lowerArch).translate([0,2],[11+6+wallsThickness,hStairs]);
+  lowerArch = S([1,2])([1.35,0.85])(lowerArch).translate([2],[0.5]);
+
   var higherArch = T([2])([mWallHeight+corniceHeight])(lowerArch);
   var leftArch = STRUCT([lowerArch,higherArch]); 
   leftArch = COLOR(beige_mura)(leftArch);
-
-  leftArch = R([0,1])([-PI/2])(leftArch).translate([0,2],[11+6+wallsThickness,hStairs]);
-  leftArch = S([1])([1.3])(leftArch);
 
   return leftArch;
 }
@@ -1324,10 +1315,10 @@ var buildFloors = function() {
 }
 
 var buildCeilings = function() {
-	var externalCeiling = SIMPLEX_GRID([[11],[7],[0]]).translate([0,1,2],[wallsThickness-1,wallsThickness,lWallHeight+mWallHeight+corniceHeight +mWallHeight*9/24]);
+	var externalCeiling = SIMPLEX_GRID([[11],[7],[0]]).translate([0,1,2],[wallsThickness-1,wallsThickness,lWallHeight+mWallHeight+corniceHeight +mWallHeight*12/24]);
 	var topCeiling = SIMPLEX_GRID([[wallsThickness + 6 + stairsTotalWidth/2],[4*wallsThickness +7+7+9],[0]]).translate([0,2],[11,totalWallHeight+corniceHeight+0.01]);
-
-	var leftCeilings = STRUCT([externalCeiling,topCeiling]);
+	var sideCeiling = SIMPLEX_GRID([[-11,0.01],[-wallsThickness,8],[-lWallHeight-mWallHeight-corniceHeight -mWallHeight*12/24,mWallHeight*12/24]]);
+	var leftCeilings = STRUCT([externalCeiling,topCeiling,sideCeiling]);
 	var ceilings = duplicate(leftCeilings);
 
 	DRAW(ceilings);
@@ -1384,27 +1375,7 @@ var buildVilla = function(){
 
 
 /* ------------------------------------------------------------------------------------*/
-var domain1 = DOMAIN([[0,1],[0,1]])([20,20]);
-var beige_mura = [0.992,0.96,0.901];
-var grigio_colonna = [0.960,0.960,0.960];
 
-
-//funzione che prepara la nubs a partire dai punti di controllo, per poi usarla in s1
-function nubsS0 (controlpoints) {
-  var curveKnots = makeKnots(controlpoints);
-  var spline = NUBS(S0)(2)(curveKnots)(controlpoints);
-  return spline;
-}
-//Funzione che, date due nubs s0 , le adopera come argomento di una hermite s1
-function hermiteS1 (nubs1, nubs2, tan1, tan2) {
-  var controlpoints = [nubs1, nubs2, tan1, tan2];
-  var sur = CUBIC_HERMITE(S1)(controlpoints);
-  var surface = MAP(sur)(domain1);
-  return surface;
-}
-
-var domain = INTERVALS(1)(32);
-var ddom = DOMAIN([[0,1],[0,1]])([50,10]);
 
 var buildCurveWalls = function() {
 	var front1st = buildCurveWall([0.5,0,lWallHeight+mWallHeight/12]);
@@ -1451,10 +1422,26 @@ var buildCurveWall = function(p,side) {
 	else {
 		
 	}
-curveWall.translate([0,1,2],[p[0],p[1],p[2]]);
+	curveWall.translate([0,1,2],[p[0],p[1],p[2]]);
 	
 	return curveWall;	
 	
+}
+
+var buildCurveWindow = function() {
+	var cpTopWindow = [[0,0,bigWindowHeight*3/4],[windowWidth/2,0,bigWindowHeight*10/8],[windowWidth,0,bigWindowHeight*3/4]];
+
+	// curva 1
+	var curveMapping = BEZIER(S0)(cpTopWindow);
+	// parte curva di vetro
+	var v1 = [0,0,bigWindowHeight*3/4];
+	var frontGlass = MAP( CONICAL_SURFACE(v1) (curveMapping) )(ddom);
+	var backGlass = T([1])([windowThickness])(frontGlass);
+	var bottomGlass =BOUNDARY( CUBOID([windowWidth,windowThickness,bigWindowHeight*3/4]) );
+
+	var glass = STRUCT([frontGlass,backGlass,bottomGlass]);
+	glass = COLOR(GLASS)(glass);
+	return glass;
 }
 
 
