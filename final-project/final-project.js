@@ -96,9 +96,7 @@ var blindHeight = 0.1;
 //-------------------------------------------------------------------------------
 
 // DOOR
-//var bigDoorWidth = 3.25;
 var bigDoorWidth = 2.5;
-//var bigDoorHeight = 5.625;
 var bigDoorHeight = mWallHeight*5/7;
 
 var doorThickness = 0.25;
@@ -120,8 +118,8 @@ var highPartColumnBase = 0.04;
 var columnBaseHeight = highPartColumnBase*11;
 
 // COLONNE DARIO
-var domainR = DOMAIN([[0,1],[0,2*PI]])([40,30]);
-//var domainR = DOMAIN([[0,1],[0,2*PI]])([20,15]);
+//var domainR = DOMAIN([[0,1],[0,2*PI]])([40,30]);
+var domainR = DOMAIN([[0,1],[0,2*PI]])([20,15]);
 var domain2d = DOMAIN([[0,1],[0,1]])([50,1]);
 var bColor = [1,1,0.9];
 var hColumn = mWallHeight -columnBaseHeight; // - capitalHeight
@@ -1383,35 +1381,14 @@ var buildVilla = function(){
 }
 
 
-/* ------------------------------------------ STOLEN ------------------------------------------*/
+/* ------------------------------------------------------------------------------------*/
 var domain1 = DOMAIN([[0,1],[0,1]])([20,20]);
 var beige_mura = [0.992,0.96,0.901];
 var grigio_colonna = [0.960,0.960,0.960];
 
 
-//funzione per calcolare i knots della NUBS
-function knots (points) {
-  var m = points.length;
-  var k = 2; //grado della curva, per ora pari a 2 (sempre)
-  var n = (m + k + 1);
-  var l = n - 3; //numeo da cui si parte per terminare la sequenza
-  var j = 1; // primo elemento della sequenza
-  var knots = [];
-  for (var i = 0; i < 3; i++) {
-    knots[i] = 0;
-  };
-  for (var i = 3; i < l; i++, j++) {
-    knots[i] = j;
-  };
-  for (var i = l; i < n; i++) {
-    knots[i] = j;
-  };
- return knots;
-};
-
 //funzione che prepara la nubs a partire dai punti di controllo, per poi usarla in s1
 function nubsS0 (controlpoints) {
-  //var curveKnots = knots(controlpoints);
   var curveKnots = makeKnots(controlpoints);
   var spline = NUBS(S0)(2)(curveKnots)(controlpoints);
   return spline;
@@ -1427,4 +1404,56 @@ function hermiteS1 (nubs1, nubs2, tan1, tan2) {
 
 
 /* ------------------------------------------ END ------------------------------------------*/
-buildVilla();
+//buildVilla();
+//DRAW(buildWalls());
+
+
+var curveWindows = function() {
+
+	var cpTopWindow = [[0,0,bigWindowHeight*3/4],[windowWidth/2,0,bigWindowHeight],[windowWidth,0,bigWindowHeight*3/4]];
+	var topWindowKnots = makeKnots(cpTopWindow);
+	var topWindowCurve = NUBS(S0)(2)(topWindowKnots)(cpTopWindow);
+	//var mapping = ROTATIONAL_SURFACE(topWindowCurve);
+
+	var curveMapping = CUBIC_HERMITE(S0)(cpTopWindow);
+	var curve = MAP(curveMapping)(INTERVALS(1)(20));
+
+	DRAW(topWindowCurve);
+	
+	//var middle = MAP(mappingMiddle)(domainR);
+}
+
+//  var c_arch_chiusura_ext = nubsS0(p_arch_chiusura_ext);
+  //  var c_arch_chiusura_int = nubsS0(p_arch_chiusura_int);
+
+    //var chiusura_ext = hermiteS1(c_arch_chiusura_ext,c_arch_ext, [0,0,0], [0,0,0]);
+    curveWindows();
+
+
+
+var cpTopWindow = [[0,0,bigWindowHeight*3/4],[windowWidth/2,0,bigWindowHeight*10/8],[windowWidth,0,bigWindowHeight*3/4]];
+var domain = INTERVALS(1)(32);
+var controlpoints = cpTopWindow;
+var curveMapping = BEZIER(S0)(controlpoints);
+var curve = MAP(curveMapping)(domain);
+DRAW(curve);
+
+DRAW(POLYLINE([[0,0,0],[0,0,bigWindowHeight*3/4],[windowWidth/2,0,bigWindowHeight],[windowWidth,0,bigWindowHeight*3/4],[windowWidth,0,0],[0,0,0]]))
+
+
+
+var domain = INTERVALS(1)(6);
+var controlpoints = [[0,0,bigWindowHeight*3/4],[windowWidth,0,bigWindowHeight*3/4],[windowWidth,0,0],[0,0,0],[0,0,bigWindowHeight*3/4]];
+var curveMapping = BEZIER(S0)(controlpoints);
+var curve = MAP(curveMapping)(domain);
+DRAW(curve);
+
+DRAW(POLYLINE(controlpoints));
+
+var domain = PROD1x1([INTERVALS(1)(16),INTERVALS(1)(16)]);
+var c0 = BEZIER(S0)([[0,0,0],[1,0,0]]);
+var c1 = BEZIER(S0)([[1,0,0],[1,0,1]]);
+var c2 = BEZIER(S0)([[1,0,1],[7,5,-1],[8,5,1],[12,4,0]]);
+var c3 = BEZIER(S0)([[0,6,0],[9,6,3],[10,6,-1]]);
+var out = MAP(BEZIER(S1)([c0,c1,c2,c3]))(domain);
+DRAW(out);
