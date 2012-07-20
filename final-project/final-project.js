@@ -5,7 +5,7 @@ var roofDomain = DOMAIN([[0,1],[0,1]])([6,6]);
 var columnDomain = DOMAIN([[0,1],[0,2*PI]])([1,15]);
 var poleDomain = DOMAIN([[0,1],[0,2*PI]])([5,15]);
 var domain2d = DOMAIN([[0,1],[0,1]])([50,1]);
-var spiralDomain = DOMAIN([[0,1],[0,1]])([20,30]);
+var spiralDomain = DOMAIN([[0,1],[0,1]])([15,20]);
 //var spiralDomain = DOMAIN([[0,1],[0,1]])([1,1]);
 var p = 10; // proportion
 
