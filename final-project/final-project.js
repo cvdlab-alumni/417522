@@ -1106,6 +1106,7 @@ var buildRoofs = function() {
 	leftRoof = STRUCT([cRoof,hRoof,externalRoof,subTympanum,subTympanumBack,subRoof,sideGuttam]);
 	
 	var roof = duplicate(leftRoof);
+	
 
 	var pediment = buildPediment();
 
@@ -1162,7 +1163,10 @@ var buildCentralRoof = function() {
 	
 	var stylobate = STRUCT([stylobateFront,lowStylobateFront,stylobateBack,lowStylobateBack]);
 
-	var roofZAxis = STRUCT([halfTympanum,roof1Surface,stylobate]);
+	var roofBase = SIMPLICIAL_COMPLEX([[0,0,0],[0,roofDepth+rColumn+1,0],[horizontalCentralRoofWidth_half,roofDepth+rColumn+1,0],[horizontalCentralRoofWidth_half,0,0]]);
+	roofBase = COLOR(ROOF)(roofBase);
+
+	var roofZAxis = STRUCT([halfTympanum,roof1Surface,stylobate,roofBase]);
 	roofZAxis.translate([1],[-colonnadeDepth]);
 
 	return roofZAxis;
