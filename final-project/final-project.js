@@ -1163,7 +1163,8 @@ var buildCentralRoof = function() {
 	
 	var stylobate = STRUCT([stylobateFront,lowStylobateFront,stylobateBack,lowStylobateBack]);
 
-	var roofBase = SIMPLICIAL_COMPLEX([[0,0,0],[0,roofDepth+rColumn+1,0],[horizontalCentralRoofWidth_half,roofDepth+rColumn+1,0],[horizontalCentralRoofWidth_half,0,0]]);
+	var roofBase = SIMPLICIAL_COMPLEX([[0,0,0],[0,roofDepth+rColumn+1,0],[horizontalCentralRoofWidth_half,roofDepth+rColumn+1,0],[horizontalCentralRoofWidth_half,0,0]])
+			([0,1,2,3]);
 	roofBase = COLOR(ROOF)(roofBase);
 
 	var roofZAxis = STRUCT([halfTympanum,roof1Surface,stylobate,roofBase]);
